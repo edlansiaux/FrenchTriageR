@@ -1,0 +1,99 @@
+---
+title: "Premiers pas avec FrenchTriageR"
+author: "Edouard Lansiaux"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+```
+Introduction
+Bienvenue dans FrenchTriageR ! Ce package R permet d'implémenter l'algorithme de triage médical FRENCH pour la classification des urgences. Ce guide vous montrera comment :
+
+Installer le package
+
+Importer des données médicales brutes
+
+Appliquer l'algorithme de triage
+
+Visualiser et exporter les résultats
+
+Installation
+
+```{r setup, include = FALSE}
+# Depuis GitHub
+if (!require("devtools")) install.packages("devtools")
+devtools::install_github("votre_compte/FrenchTriageR")
+
+# Version de développement
+devtools::install_github("votre_compte/FrenchTriageR@develop")
+```
+Chargement du package
+```{r}
+library(FrenchTriageR)
+library(ggplot2)
+```
+Utilisation de base
+Étape 1 : Importation des données
+```{r}
+# Chemin vers les données d'exemple
+sample_path <- system.file("extdata", "sample_data.xlsx", package = "FrenchTriageR")
+
+# Prétraitement des données
+data_clean <- preprocess_data(sample_path)
+
+# Aperçu des données
+head(data_clean)
+```
+Étape 2 : Application du triage FRENCH
+```{r}
+# Exécution de l'algorithme
+results <- apply_french_triage(data_clean)
+
+# Structure des résultats
+str(results[, c("motif1", "french_triage_level")])
+```
+Étape 3 : Visualisation des résultats
+```{r}
+# Distribution des niveaux de triage
+plot_triage_distribution(results) +
+  theme(legend.position = "bottom")
+```
+Fonctionnalités avancées
+Utilisation avec des données personnalisées
+```{r}
+# Pour vos propres données
+my_data <- preprocess_data("path/to/your/data.xlsx")
+custom_results <- run_french_triage(my_data)
+```
+Génération de rapports
+```{r}
+# Rapport synthétique
+rapport <- generate_triage_report(results)
+print(rapport)
+```
+Dépannage courant
+```{r}
+# Problème : Colonnes manquantes
+# Solution : Vérifier le format d'entrée
+check_required_columns(data_clean)
+
+# Problème : Format de fichier
+# Solution : Convertir en Excel
+openxlsx::write.xlsx(your_data, "data.xlsx")
+```
+
+
+
+

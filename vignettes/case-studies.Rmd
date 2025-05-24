@@ -1,0 +1,211 @@
+---
+title: "Études de Cas Cliniques avec FrenchTriageR"
+author: "Votre Nom"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Case Studies}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6
+)
+library(FrenchTriageR)
+library(ggplot2)
+```
+Introduction
+Cette vignette présente des cas cliniques réels validés par des urgentistes pour illustrer :
+
+Le processus décisionnel de l'algorithme
+
+L'interprétation des résultats
+
+Les nuances de classification
+```{r}
+# Chargement des helpers
+source(system.file("extdata", "clinical_helpers.R", package = "FrenchTriageR"))
+```
+Cas 1 : Douleur Thoracique
+Présentation Clinique
+Patient de 58 ans, diabétique
+
+Douleur rétrosternale intense (EVA=8/10)
+
+ECG : Sus-décalage ST
+```{r}
+cas1 <- data.frame(
+  MOTIF2 = "Douleur thoracique type angineuse",
+  PAS = 110,
+  ECG = "Anormal",
+  Douleur = "Intense",
+  Comorbidite = "Oui",
+  Temperature = 36.8
+)
+
+apply_french_triage(cas1) %>% 
+  select(motif1, french_triage_level)
+```
+Analyse :
+
+Niveau 2 (Urgence absolue) dû à :
+
+Comorbidité significative (diabète)
+
+ECG anormal + douleur intense
+
+Risque coronarien élevé
+
+Cas 2 : Traumatisme Crânien
+Présentation Clinique
+Jeune de 22 ans après chute
+
+GCS=14, Otorragie
+
+Pas de perte de connaissance
+```{r}
+cas2 <- data.frame(
+  MOTIF2 = "Traumatisme crânien avec otorragie",
+  GCS = 14,
+  Otorragie = "Oui",
+  AOD = "Non",
+  AVK = "Non",
+  Vomissements = "Non"
+)
+
+apply_french_triage(cas2) %>% 
+  select(french_triage_level, delai_prise_en_charge)
+```
+Analyse :
+
+Niveau 4 (Urgence différée) car :
+
+GCS > 13
+
+Pas de signes de gravité immédiats
+
+Surveillance nécessaire
+
+Cas 3 : Fièvre Pédiatrique
+Présentation Clinique
+Enfant de 3 ans
+
+Température=40.2°C
+
+Terrain : Immunodéprimé
+```{r}
+cas3 <- data.frame(
+  MOTIF2 = "Fièvre élevée chez nourrisson",
+  Temperature = 40.2,
+  Comorbidite = "Oui",
+  Age = 3,
+  Douleur = "Modérée"
+)
+
+apply_french_triage(cas3) %>%
+  select(french_triage_level, motif1)
+```
+Analyse :
+
+Niveau 3A (Urgence relative avec comorbidité) car :
+
+Fièvre >40°C
+
+Terrain à risque
+
+Nécessite bilan rapide
+
+Cas 4 : Crise Psychiatrique
+Présentation Clinique
+Patient de 35 ans, idées suicidaires
+
+Agitation modérée
+
+Pas de comorbidités physiques
+```{r}
+cas4 <- data.frame(
+  MOTIF2 = "Idées suicidaires avec plan précis",
+  Agitation = "Oui",
+  Comorbidite = "Non",
+  Douleur = "Non"
+)
+
+apply_french_triage(cas4)
+```
+Analyse :
+
+Niveau 2 (Urgence absolue) malgré l'absence de comorbidités :
+
+Risque vital psychiatrique
+
+Nécessité de protection immédiate
+
+Analyse Comparative
+```{r}
+cas <- list(cas1, cas2, cas3, cas4)
+comparaison <- do.call(rbind, lapply(cas, function(x) {
+  res <- apply_french_triage(x)
+  data.frame(
+    Cas = paste("Cas", which(cas == x)),
+    Niveau = res$french_triage_level,
+    Délai = attr(res$french_triage_level, "levels")[res$french_triage_level]
+  )
+}))
+
+ggplot(comparaison, aes(x = Cas, fill = Niveau)) + 
+  geom_bar() +
+  scale_fill_brewer(palette = "RdYlGn", direction = -1) +
+  labs(title = "Répartition des niveaux de triage par cas")
+```
+Interprétation des Résultats
+
+Niveau	Délai Max	Implications Cliniques
+1	Immédiat	Réanimation nécessaire
+2	20 min	Surveillance continue
+3A	60 min	Bilan rapide requis
+3B	60 min	Prise en charge standard
+4	120 min	Consultation différée
+5	240 min	Soins non urgents
+
+Personnalisation des Cas
+Adaptation aux Protocoles Locaux
+```{r}
+# Exemple : Modifier les seuils pédiatriques
+cas_pediatrique <- data.frame(
+  MOTIF2 = "Détresse respiratoire",
+  Age = 2,
+  SpO2 = 89,
+  FC = 160
+)
+
+# Application avec paramètres modifiés
+apply_french_triage(cas_pediatrique) %>% 
+  mutate(
+    french_triage_level = ifelse(
+      Age < 5 & SpO2 < 90,
+      "Urgence vitale - Prise en charge immédiate",
+      as.character(french_triage_level)
+    )
+  )
+```
+Conclusion
+Enseignements Clés :
+
+L'algorithme intègre à la fois les signes cliniques et le contexte patient
+
+Les comorbidités modifient significativement le niveau de priorité
+
+La personnalisation reste possible pour des besoins spécifiques
+
+Prochaines Étapes :
+```{r}
+cat("1. Valider avec votre comité de protocole local\n2. Intégrer vos données historiques\n3. Former le personnel aux interprétations")
+sessionInfo()
+```
+

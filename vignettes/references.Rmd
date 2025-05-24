@@ -1,0 +1,6 @@
+@article{french_protocol,
+  title={Protocol FRENCH v2.3},
+  author={Société Française de Médecine d'Urgence},
+  year={2022},
+  publisher={Elsevier}
+}
