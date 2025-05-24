@@ -1,0 +1,19 @@
+Package: FrenchTriageR
+Title: Implementation of FRENCH Triage Algorithm in R
+Version: 0.9.0
+Authors@R: person("Edouard", "Lansiaux", role = c("aut", "cre"), email = "edouard.lansiaux@orange.fr")
+Description: Implémentation de l'algorithme de triage médical FRENCH avec capacité de prédiction et d'analyse.
+License: MIT
+Depends:
+    R (>= 4.0.0)
+Imports:
+    dplyr,
+    readxl,
+    stringr,
+    stringi,
+    tidyr,
+    openxlsx
+Suggests:
+    testthat,
+    knitr,
+    rmarkdown
