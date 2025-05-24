@@ -27,7 +27,7 @@ if (!require("devtools")) install.packages("devtools")
 devtools::install_github("votre_compte/FrenchTriageR")
 ```
 
-🚀 Utilisation basique
+## 🚀 Utilisation basique
 ```r
 library(FrenchTriageR)
 
@@ -45,12 +45,12 @@ generate_triage_report(results)
 plot_triage_distribution(results)
 ```
 
-##⚠️ Avertissements importants
+## ⚠️ Avertissements importants
 Ce logiciel ne doit pas être utilisé pour des décisions médicales réelles
 
 Les résultats doivent toujours être validés par un professionnel de santé qualifié
 
 Les données d'exemple fournies sont entièrement synthétiques
 
-##📜 Licence
+## 📜 Licence
 MIT License - Voir le fichier [LICENSE](https://github.com/edlansiaux/FrenchTriageR/blob/main/LICENSE) pour plus de détails
